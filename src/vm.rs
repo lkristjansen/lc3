@@ -13,6 +13,12 @@ impl Memory {
             ram: [0; MEMORY_SIZE],
         }
     }
+
+    fn load(&mut self, block: &[u16], offset: u16) {
+        let start = offset as usize;
+        let end = start + block.len();
+        self.ram[start..end].copy_from_slice(block);
+    }
 }
 
 impl Index<u16> for Memory {
@@ -174,7 +180,7 @@ impl From<u16> for Opcode {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct Machine {
     mem: Memory,
     registers: RegisterCluster,
@@ -186,6 +192,10 @@ impl Machine {
             mem: Memory::new(),
             registers: RegisterCluster::default(),
         }
+    }
+
+    pub fn load(&mut self, block: &[u16], offset: u16) {
+        self.mem.load(block, offset);
     }
 
     pub fn step(&mut self) {
